@@ -1,10 +1,58 @@
 body {
   padding-top: 50px;
+
 }
 .starter-template {
   padding: 40px 15px;
   text-align: center;
 }
-#headshot {
-    width: 500px;
+
+#player {
+  margin-top: 50px;
+  margin-left: 200px;
 }
+
+#controller {
+  margin-left: 200px;
+}
+
+.item {
+  float:left;
+}
+
+#line {
+  margin-top: 10px;
+  width: 620px;
+  height: 5px;
+  background-color: #111;
+  border-radius: 1.5em;
+  vertical-align: middle;
+}
+
+#square {
+  width: 10px;
+  height: 10px;
+  background-color: blue;
+
+}
+
+.progressBar{
+  margin-left: 90px;
+  width: 200px;
+  height: 20px;
+  position: relative;
+}
+
+.box{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.8;  /* for demo purpose  */
+}
+.stack-top{
+  z-index: 9;
+  margin: 10px; /* for demo purpose  */
+}
+
