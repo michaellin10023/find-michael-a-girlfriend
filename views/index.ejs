@@ -13,12 +13,14 @@
     <title>project find michael a girlfriend</title>
 
     <!-- Bootstrap core CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')</script>
+    <script src="js/bootstrap.min.js"></script>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <!-- Custom styles for this template -->
@@ -48,13 +50,19 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
+    <iframe id="youtube_video"
+            width="720" height="480"
+            src="https://www.youtube.com/embed/IHNzOHi8sJs?enablejsapi=1&autoplay=0&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
+            frameborder="0"
+            style="border: solid 4px #37474F"
+    ></iframe>
 
     <div class="container">
 
       <div id="player"></div>
 
       <div id="controller">
-          <div class="item">
+          <div class="btns">
             <button id="play" type="button" class="btn btn-default" aria-label="Left Align">
               <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
             </button>
@@ -62,75 +70,82 @@
               <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
             </button>
           </div>
-          <div class="progressBar">
-            <div id="line" style="background: red;"></div>
-            <div id="square" class="stack-top" style="background: blue;"></div>
-          </div>
+          <input type="range" id="progress-bar" value="0">
 
       </div>
 
-      <script>
-        // 2. This code loads the IFrame Player API code asynchronously.
-        var tag = document.createElement('script');
+  </div><!-- /.container -->
 
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    <script type="text/javascript">
+      var tag = document.createElement('script');
+      tag.id = 'iframe-demo';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // 3. This function creates an <iframe> (and YouTube player)
-        //    after the API code downloads.
-        var player;
-        function onYouTubeIframeAPIReady() {
-          player = new YT.Player('player', {
-            height: '480',
-            width: '720',
-            videoId: 'IHNzOHi8sJs',
-            playerVars: {
-              'autoplay': 0,
-              'controls': 0,
-              'disablekb' : 1,
-              'modestbranding': 1,
-              'showinfo' : 0,
-              'rel' : 0
-            },
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('youtube_video', {
             events: {
               'onReady': onPlayerReady,
               'onStateChange': onPlayerStateChange
             }
-          });
-        }
-
-        document.getElementById('play').addEventListener('click', function(){
-          player.playVideo();
         });
-        document.getElementById('pause').addEventListener('click', function(){
-          player.pauseVideo();
-        });
+      }
 
-        // 4. The API will call this function when the video player is ready.
-        function onPlayerReady(event) {
-          event.target.playVideo();
-        }
+      function onPlayerReady(event) {
+        document.getElementById('youtube_video').style.borderColor = '#FF6D00';
+      }
 
-        // 5. The API calls this function when the player's state changes.
-        //    The function indicates that when playing a video (state=1),
-        //    the player should play for six seconds and then stop.
-        var done = false;
-        function onPlayerStateChange(event) {
-          if (event.data == YT.PlayerState.PLAYING && !done) {
-            setTimeout(stopVideo, 6000);
-            done = true;
-          }
+      function changeBorderColor(playerStatus) {
+        var color;
+        if (playerStatus == -1) {
+          color = "#37474F"; // unstarted = gray
+        } else if (playerStatus == 0) {
+          color = "#FFFF00"; // ended = yellow
+        } else if (playerStatus == 1) {
+          color = "#33691E"; // playing = green
+        } else if (playerStatus == 2) {
+          color = "#DD2C00"; // paused = red
+        } else if (playerStatus == 3) {
+          color = "#AA00FF"; // buffering = purple
+        } else if (playerStatus == 5) {
+          color = "#FF6DOO"; // video cued = orange
         }
-        function stopVideo() {
-          player.stopVideo();
+        if (color) {
+          document.getElementById('youtube_video').style.borderColor = color;
         }
-      </script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-      <script>window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')</script>
-      <script src="js/bootstrap.min.js"></script>
-    </div><!-- /.container -->
-    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+      }
+      function onPlayerStateChange(event) {
+        changeBorderColor(event.data);
+      }
+    </script>
+
+    <script type="text/javascript">
+      document.getElementById('play').addEventListener('click', function(){
+        player.playVideo();
+        time_update_interval = setInterval(function(){
+          updateProgressBar();
+        },200);
+
+      })
+      document.getElementById('pause').addEventListener('click', function(){
+        player.pauseVideo();
+      })
+    </script>
+
+    <script type="text/javascript">
+      $('#progress-bar').on('mouseup', function(e){
+        var newTime = player.getDuration() *(e.target.value / 100);
+        player.seekTo(newTime);
+      });
+
+      function updateProgressBar(){
+        $('#progress-bar').val((player.getCurrentTime() / player.getDuration()) * 100);
+        console.log((player.getCurrentTime() / player.getDuration()) * 100);
+      }
+    </script>
+
   </body>
 
 
