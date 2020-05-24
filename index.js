@@ -15,15 +15,15 @@ io.on('connection', function(){
   console.log('a user connected');
 })
 
-io.on('connection', (socket) => {
-  socket.on('playEvent', (msg) => {
-    console.log('{state: ' + msg.state + ' time: ' + msg.time + '}');
-    io.sockets.emit('broadcast',msg);
-  });
-});
+// io.on('connection', (socket) => {
+//   socket.on('playEvent', (msg) => {
+//     console.log('{state: ' + msg.state + ' time: ' + msg.time + '}');
+//     io.sockets.emit('broadcast',msg);
+//   });
+// });
 
 io.on('connection', (socket) => {
-  socket.on('pauseEvent', (msg) => {
+  socket.on('Event', (msg) => {
     console.log('{state: ' + msg.state + ' time: ' + msg.time + '}');
     io.sockets.emit('broadcast',msg);
   });

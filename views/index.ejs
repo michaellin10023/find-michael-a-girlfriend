@@ -53,7 +53,7 @@
     </nav>
     <iframe id="youtube_video"
             width="720" height="480"
-            src="https://www.youtube.com/embed/IHNzOHi8sJs?enablejsapi=1&autoplay=1&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
+            src="https://www.youtube.com/embed/TgOu00Mf3kI?enablejsapi=1&autoplay=1&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
             frameborder="0"
             style="border: solid 4px #37474F"
     ></iframe>
@@ -77,42 +77,79 @@
       </div>
 
       <script type="text/javascript">
+        var tag = document.createElement('script');
+        tag.id = 'iframe-demo';
+        tag.src = 'https://www.youtube.com/iframe_api';
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+          player = new YT.Player('youtube_video', {
+              events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+              }
+          });
+        }
+        function getCurrentTime(){
+          player.getCurrentTime();
+        }
+        function getDuration(){
+          player.getDuration();
+        }
+        function updateProgressBar(curTime){
+          $('#progress-bar').val((curTime / player.getDuration()) * 100);
+          // console.log((getCurrentTime() / getDuration()) * 100);
+        }
+
+        function initialize(curTime){
+          time_update_interval = setInterval(function(){
+            updateProgressBar(player.getCurrentTime(),player.getDuration());
+          },200);
+        }
+        function playVideo(curTime){
+          initialize(curTime);
+          player.playVideo();
+        }
+        function pauseVideo(curTime){
+          initialize(curTime);
+          player.pauseVideo();
+        }
+        function seekTo(curTime){
+          initialize(curTime);
+          player.seekTo(curTime);
+        }
+      </script>
+
+      <script type="text/javascript">
         var socket = io();
         document.getElementById('play').addEventListener('click', function(){
+          playVideo(player.getCurrentTime());
           var myData = {'state':1,'time':player.getCurrentTime()};
-          socket.emit('playEvent',myData);
+          socket.emit('Event',myData);
         });
         document.getElementById('pause').addEventListener('click',function(){
+          pauseVideo(player.getCurrentTime());
           var myData = {'state':2,'time':player.getCurrentTime()};
-          socket.emit('pauseEvent',myData);
+          socket.emit('Event',myData);
         });
         $('#progress-bar').on('mouseup', function(e){
-          socket.emit('timeEvent', player.getCurrentTime());
+          var myData = {'state':player.getPlayerState(),'time':player.getCurrentTime()};
+          socket.emit('Event',myData);
+          var newTime = player.getDuration() *(e.target.value / 100);
+          player.seekTo(newTime);
         });
-
       </script>
+
+
 
   </div><!-- /.container -->
 
     <script type="text/javascript">
-      var tag = document.createElement('script');
-      tag.id = 'iframe-demo';
-      tag.src = 'https://www.youtube.com/iframe_api';
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-      var player;
-      function onYouTubeIframeAPIReady() {
-        player = new YT.Player('youtube_video', {
-            events: {
-              'onReady': onPlayerReady,
-              'onStateChange': onPlayerStateChange
-            }
-        });
-      }
-
       function onPlayerReady(event) {
         document.getElementById('youtube_video').style.borderColor = '#FF6D00';
+        // initialize(player.getCurrentTime());
       }
 
       function changeBorderColor(playerStatus) {
@@ -139,44 +176,26 @@
       }
 
       var output = document.getElementById('output');
-        socket.on('broadcast', function(data){
-          if(data.state == 1){
-            output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
-            player.seekTo(data.time);
-            // player.playVideo();
+      socket.on('broadcast', function(data){
+        // play
+        if(data.state == 1){
+           if(Math.abs(data.time - player.getCurrentTime()) > 1){
+            seekTo(data.time);
           }
-          else if(data.state == 2){
-            output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
-            player.seekTo(data.time);
-            // player.pauseVideo();
+          output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
+          playVideo(data.time);
+        }
+        // pause
+        else if(data.state == 2){
+          if(Math.abs(data.time - player.getCurrentTime()) > 1){
+            seekTo(data.time);
           }
-        })
-    </script>
-
-    <script type="text/javascript">
-      document.getElementById('play').addEventListener('click', function(){
-        player.playVideo();
-        time_update_interval = setInterval(function(){
-          updateProgressBar();
-        },200);
-
-      })
-      document.getElementById('pause').addEventListener('click', function(){
-        player.pauseVideo();
-      })
-    </script>
-
-    <script type="text/javascript">
-      $('#progress-bar').on('mouseup', function(e){
-        var newTime = player.getDuration() *(e.target.value / 100);
-        player.seekTo(newTime);
+          output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
+          pauseVideo(data.time);
+        }
       });
-
-      function updateProgressBar(){
-        $('#progress-bar').val((player.getCurrentTime() / player.getDuration()) * 100);
-        // console.log((player.getCurrentTime() / player.getDuration()) * 100);
-      }
     </script>
+
 
   </body>
 
