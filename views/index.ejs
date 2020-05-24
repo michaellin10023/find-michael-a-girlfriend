@@ -12,6 +12,7 @@
 
     <title>project find michael a girlfriend</title>
 
+    <script src="/socket.io/socket.io.js"></script>
     <!-- Bootstrap core CSS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')</script>
@@ -52,7 +53,7 @@
     </nav>
     <iframe id="youtube_video"
             width="720" height="480"
-            src="https://www.youtube.com/embed/IHNzOHi8sJs?enablejsapi=1&autoplay=0&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
+            src="https://www.youtube.com/embed/IHNzOHi8sJs?enablejsapi=1&autoplay=1&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
             frameborder="0"
             style="border: solid 4px #37474F"
     ></iframe>
@@ -72,7 +73,24 @@
           </div>
           <input type="range" id="progress-bar" value="0">
 
+          <div id="output"></div>
       </div>
+
+      <script type="text/javascript">
+        var socket = io();
+        document.getElementById('play').addEventListener('click', function(){
+          var myData = {'state':1,'time':player.getCurrentTime()};
+          socket.emit('playEvent',myData);
+        });
+        document.getElementById('pause').addEventListener('click',function(){
+          var myData = {'state':2,'time':player.getCurrentTime()};
+          socket.emit('pauseEvent',myData);
+        });
+        $('#progress-bar').on('mouseup', function(e){
+          socket.emit('timeEvent', player.getCurrentTime());
+        });
+
+      </script>
 
   </div><!-- /.container -->
 
@@ -119,6 +137,20 @@
       function onPlayerStateChange(event) {
         changeBorderColor(event.data);
       }
+
+      var output = document.getElementById('output');
+        socket.on('broadcast', function(data){
+          if(data.state == 1){
+            output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
+            player.seekTo(data.time);
+            // player.playVideo();
+          }
+          else if(data.state == 2){
+            output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
+            player.seekTo(data.time);
+            // player.pauseVideo();
+          }
+        })
     </script>
 
     <script type="text/javascript">
@@ -142,7 +174,7 @@
 
       function updateProgressBar(){
         $('#progress-bar').val((player.getCurrentTime() / player.getDuration()) * 100);
-        console.log((player.getCurrentTime() / player.getDuration()) * 100);
+        // console.log((player.getCurrentTime() / player.getDuration()) * 100);
       }
     </script>
 

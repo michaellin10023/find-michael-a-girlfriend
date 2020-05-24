@@ -1,0 +1,8 @@
+case 1:
+    user1 plays video, user2 see the video playing from same starting point
+
+case 2:
+    user1 stops video, user2 see the video paused same pausing point
+
+case 3:
+    user1
