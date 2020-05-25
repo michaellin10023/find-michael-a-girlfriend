@@ -51,6 +51,76 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
+
+    <script type="text/javascript">
+      var socket = io();
+      var player, time_update_interval = 0;
+      var tag = document.createElement('script');
+      tag.id = 'iframe-demo';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('youtube_video', {
+            events: {
+              'onReady': onPlayerReady,
+              'onStateChange': onPlayerStateChange
+            }
+        });
+      }
+      function getCurrentTime(){
+        player.getCurrentTime();
+      }
+      function getDuration(){
+        player.getDuration();
+      }
+      function updateProgressBar(){
+        $('#progress-bar').val((player.getCurrentTime() / player.getDuration()) * 100);
+      }
+
+      // function initialize(curTime){
+      //   time_update_interval = setInterval(function(){
+      //     updateProgressBar(player.getCurrentTime());
+      //   },200);
+      // }
+      function initialize(){
+        updateProgressBar();
+        clearInterval(time_update_interval);
+        time_update_interval = setInterval(function(){
+          updateProgressBar();
+        },1000);
+      }
+      function playVideo(curTime){
+        initialize();
+        player.playVideo();
+      }
+      function pauseVideo(){
+        initialize();
+        player.pauseVideo();
+      }
+      function seekTo(curTime){
+        // initialize();
+        player.seekTo(curTime);
+      }
+    </script>
+
+    <div>
+      Favorite YouTube videoId:
+      <input type="url" id="myURL" placeholder="videoId">
+      <button onclick="loadVideoById()">Load Video</button>
+      <script type="text/javascript">
+        function loadVideoById(){
+          var videoId = $('#myURL').val();
+          socket.emit('videoEvent',videoId);
+          // player.loadVideoById(videoId);
+        }
+        socket.on('videoBroadcast', function(videoId){
+          player.loadVideoById(videoId);
+        })
+      </script>
+    </div>
+
     <iframe id="youtube_video"
             width="720" height="480"
             src="https://www.youtube.com/embed/TgOu00Mf3kI?enablejsapi=1&autoplay=1&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
@@ -71,59 +141,14 @@
               <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
             </button>
           </div>
-          <input type="range" id="progress-bar" value="0">
+          <input type="range" id="progress-bar" step="any" value="0">
 
           <div id="output"></div>
       </div>
 
-      <script type="text/javascript">
-        var tag = document.createElement('script');
-        tag.id = 'iframe-demo';
-        tag.src = 'https://www.youtube.com/iframe_api';
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        var player;
-        function onYouTubeIframeAPIReady() {
-          player = new YT.Player('youtube_video', {
-              events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
-              }
-          });
-        }
-        function getCurrentTime(){
-          player.getCurrentTime();
-        }
-        function getDuration(){
-          player.getDuration();
-        }
-        function updateProgressBar(curTime){
-          $('#progress-bar').val((curTime / player.getDuration()) * 100);
-          // console.log((getCurrentTime() / getDuration()) * 100);
-        }
-
-        function initialize(curTime){
-          time_update_interval = setInterval(function(){
-            updateProgressBar(player.getCurrentTime(),player.getDuration());
-          },200);
-        }
-        function playVideo(curTime){
-          initialize(curTime);
-          player.playVideo();
-        }
-        function pauseVideo(curTime){
-          initialize(curTime);
-          player.pauseVideo();
-        }
-        function seekTo(curTime){
-          initialize(curTime);
-          player.seekTo(curTime);
-        }
-      </script>
 
       <script type="text/javascript">
-        var socket = io();
         document.getElementById('play').addEventListener('click', function(){
           playVideo(player.getCurrentTime());
           var myData = {'state':1,'time':player.getCurrentTime()};
@@ -142,14 +167,12 @@
         });
       </script>
 
-
-
   </div><!-- /.container -->
 
     <script type="text/javascript">
       function onPlayerReady(event) {
         document.getElementById('youtube_video').style.borderColor = '#FF6D00';
-        // initialize(player.getCurrentTime());
+        initialize();
       }
 
       function changeBorderColor(playerStatus) {
@@ -182,7 +205,7 @@
            if(Math.abs(data.time - player.getCurrentTime()) > 1){
             seekTo(data.time);
           }
-          output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
+          // output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
           playVideo(data.time);
         }
         // pause
@@ -190,7 +213,7 @@
           if(Math.abs(data.time - player.getCurrentTime()) > 1){
             seekTo(data.time);
           }
-          output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
+          // output.innerHTML += '<p> state : ' + data.state + ' time : ' + data.time + '</p>';
           pauseVideo(data.time);
         }
       });

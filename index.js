@@ -11,26 +11,21 @@ var server = express()
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 var io = socket(server);
-io.on('connection', function(){
-  console.log('a user connected');
-})
-
-// io.on('connection', (socket) => {
-//   socket.on('playEvent', (msg) => {
-//     console.log('{state: ' + msg.state + ' time: ' + msg.time + '}');
-//     io.sockets.emit('broadcast',msg);
-//   });
-// });
 
 io.on('connection', (socket) => {
+  console.log('a user connected');
   socket.on('Event', (msg) => {
     console.log('{state: ' + msg.state + ' time: ' + msg.time + '}');
     io.sockets.emit('broadcast',msg);
   });
+  socket.on('videoEvent', (videoId) => {
+    console.log('videoId : ' + videoId);
+    io.sockets.emit('videoBroadcast', videoId);
+  })
 });
 
-io.on('connection', (socket) =>{
-  socket.on('timeEvent', (msg) => {
-    console.log('time: ' + msg);
-  })
-})
+// io.on('connection', (socket) =>{
+//   socket.on('timeEvent', (msg) => {
+//     console.log('time: ' + msg);
+//   })
+// })

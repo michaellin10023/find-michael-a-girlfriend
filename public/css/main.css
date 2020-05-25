@@ -12,14 +12,23 @@ body {
   margin: 50px auto;
 }
 
-#player {
+#myURL {
+  margin:  auto;
+}
+
+#container {
+  display: block;
+  margin: 50px auto;
+}
+
+/* #player {
   margin-top: 5px;
   margin-left: 200px;
-}
+} */
 
 #controller {
   display: block;
-  margin-left: 200px;
+  /* margin-left: 200px; */
 }
 
 .btns {
@@ -27,7 +36,7 @@ body {
 }
 
 #progress-bar{
-  margin-left: 90px;
+  margin-left: 100px;
   width: 600px;
   height: 20px;
   position: relative;
