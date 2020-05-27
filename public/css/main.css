@@ -7,39 +7,32 @@ body {
   text-align: center;
 }
 
+#videoId {
+  margin: 10px auto;
+  width: 70%;
+  border: 3px solid green;
+  padding: 10px;
+}
+
 #youtube_video {
   display: block;
-  margin: 50px auto;
+  margin: 10px auto;
 }
-
-#myURL {
-  margin:  auto;
-}
-
-#container {
-  display: block;
-  margin: 50px auto;
-}
-
-/* #player {
-  margin-top: 5px;
-  margin-left: 200px;
-} */
 
 #controller {
-  display: block;
-  /* margin-left: 200px; */
+  text-align: center;
 }
 
 .btns {
-  float:left;
+  display: inline-block;
+
 }
 
 #progress-bar{
-  margin-left: 100px;
+  display: inline-block;
   width: 600px;
   height: 20px;
-  position: relative;
+  /* position: relative; */
   cursor: pointer;
 }
 

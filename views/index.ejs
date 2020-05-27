@@ -79,11 +79,6 @@
         $('#progress-bar').val((player.getCurrentTime() / player.getDuration()) * 100);
       }
 
-      // function initialize(curTime){
-      //   time_update_interval = setInterval(function(){
-      //     updateProgressBar(player.getCurrentTime());
-      //   },200);
-      // }
       function initialize(){
         updateProgressBar();
         clearInterval(time_update_interval);
@@ -105,7 +100,7 @@
       }
     </script>
 
-    <div>
+    <div id="videoId">
       Favorite YouTube videoId:
       <input type="url" id="myURL" placeholder="videoId">
       <button onclick="loadVideoById()">Load Video</button>
@@ -123,51 +118,42 @@
 
     <iframe id="youtube_video"
             width="720" height="480"
-            src="https://www.youtube.com/embed/TgOu00Mf3kI?enablejsapi=1&autoplay=1&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
+            src="https://www.youtube.com/embed/TgOu00Mf3kI?enablejsapi=1&autoplay=0&controls=0&disablekb=1&modestbranding=1&showinfo=0&rel=0"
             frameborder="0"
             style="border: solid 4px #37474F"
     ></iframe>
 
-    <div class="container">
+    <div id="controller">
+        <div class="btns">
+          <button id="play" type="button" class="btn btn-default" aria-label="Left Align">
+            <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+          </button>
+          <button id="pause" type="button" class="btn btn-default" aria-label="Left Align">
+            <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+          </button>
+        </div>
+        <input type="range" id="progress-bar" step="any" value="0">
+        <div id="output"></div>
+    </div>
 
-      <div id="player"></div>
-
-      <div id="controller">
-          <div class="btns">
-            <button id="play" type="button" class="btn btn-default" aria-label="Left Align">
-              <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-            </button>
-            <button id="pause" type="button" class="btn btn-default" aria-label="Left Align">
-              <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
-            </button>
-          </div>
-          <input type="range" id="progress-bar" step="any" value="0">
-
-          <div id="output"></div>
-      </div>
-
-
-
-      <script type="text/javascript">
-        document.getElementById('play').addEventListener('click', function(){
-          playVideo(player.getCurrentTime());
-          var myData = {'state':1,'time':player.getCurrentTime()};
-          socket.emit('Event',myData);
-        });
-        document.getElementById('pause').addEventListener('click',function(){
-          pauseVideo(player.getCurrentTime());
-          var myData = {'state':2,'time':player.getCurrentTime()};
-          socket.emit('Event',myData);
-        });
-        $('#progress-bar').on('mouseup', function(e){
-          var myData = {'state':player.getPlayerState(),'time':player.getCurrentTime()};
-          socket.emit('Event',myData);
-          var newTime = player.getDuration() *(e.target.value / 100);
-          player.seekTo(newTime);
-        });
-      </script>
-
-  </div><!-- /.container -->
+    <script type="text/javascript">
+      document.getElementById('play').addEventListener('click', function(){
+        playVideo(player.getCurrentTime());
+        var myData = {'state':1,'time':player.getCurrentTime()};
+        socket.emit('Event',myData);
+      });
+      document.getElementById('pause').addEventListener('click',function(){
+        pauseVideo(player.getCurrentTime());
+        var myData = {'state':2,'time':player.getCurrentTime()};
+        socket.emit('Event',myData);
+      });
+      $('#progress-bar').on('mouseup', function(e){
+        var myData = {'state':player.getPlayerState(),'time':player.getCurrentTime()};
+        socket.emit('Event',myData);
+        var newTime = player.getDuration() *(e.target.value / 100);
+        player.seekTo(newTime);
+      });
+    </script>
 
     <script type="text/javascript">
       function onPlayerReady(event) {
@@ -219,8 +205,6 @@
       });
     </script>
 
-
   </body>
-
 
 </html>
