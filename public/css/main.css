@@ -9,7 +9,8 @@ body {
 
 #videoId {
   margin: 10px auto;
-  width: 70%;
+  width: 30%;
+  text-align: center;
   border: 3px solid green;
   padding: 10px;
 }
